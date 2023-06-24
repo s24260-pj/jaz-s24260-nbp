@@ -1,17 +1,15 @@
 package com.example.jazs24260nbp.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "nbp_jaz_final")
 public class CurrentRate {
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @NotBlank(message = "Currency is mandatory")
     @Size(min = 1, max = 255)
@@ -28,8 +26,6 @@ public class CurrentRate {
     @Schema(description = "End Date")
     private String end_date;
 
-    @NotBlank(message = "Rate is mandatory")
-    @Size(min = 1, max = 255)
     @Schema(description = "Rate")
     private Double rate;
 

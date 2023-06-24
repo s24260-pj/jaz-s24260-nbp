@@ -1,7 +1,8 @@
 package com.example.jazs24260nbp.controller;
 
 import com.example.jazs24260nbp.model.CurrencyTable;
-import com.example.jazs24260nbp.model.Rate;
+import com.example.jazs24260nbp.model.CurrentRate;
+import com.example.jazs24260nbp.service.NBPService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,20 +10,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.time.LocalDate;
-import java.util.OptionalDouble;
 
 @RestController
 @RequestMapping("/exchange")
 public class NBPController {
-    private final RestTemplate restTemplate;
-    private final String NBPResourceUrl = "https://api.nbp.pl/api";
-    private final String responseFormat = "?json";
+    private final NBPService nbpService;
 
-    public NBPController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public NBPController(NBPService nbpService) {
+        this.nbpService = nbpService;
     }
 
     @ApiResponses(value = {
@@ -59,15 +54,7 @@ public class NBPController {
     })
     @Operation(summary = "Get currency")
     @GetMapping("/{currency}")
-    public ResponseEntity<OptionalDouble> getCurrency(@PathVariable(value = "currency") String currency, @RequestParam(required = false, defaultValue = "1") Integer numberOfDays) {
-        LocalDate finishDate = LocalDate.now();
-        LocalDate startDate  = finishDate.minusDays(numberOfDays);
-
-        CurrencyTable currencyTable = restTemplate.getForEntity(
-                this.NBPResourceUrl + "/exchangerates/rates/a/" + currency + "/" + startDate + "/" + finishDate + "/" + this.responseFormat,
-                CurrencyTable.class
-        ).getBody();
-
-        return ResponseEntity.ok(currencyTable.getRates().stream().mapToDouble(Rate::getMid).average());
+    public ResponseEntity<CurrentRate> getCurrency(@PathVariable(value = "currency") String currency, @RequestParam String startDate, @RequestParam String finishDate) {
+        return ResponseEntity.ok(this.nbpService.save(currency, startDate, finishDate));
     }
 }
