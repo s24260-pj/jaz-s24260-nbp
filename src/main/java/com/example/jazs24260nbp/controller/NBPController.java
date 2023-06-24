@@ -27,7 +27,7 @@ public class NBPController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = CurrencyTable.class)
+                                    schema = @Schema(implementation = CurrentRate.class)
                             )
                     }
             ),
